@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class FilmsFilterDTO(BaseModel):
+class FilmsFilterDto(BaseModel):
     title: Optional[str]
     episode_id: Optional[int]
     opening_crawl: Optional[str]

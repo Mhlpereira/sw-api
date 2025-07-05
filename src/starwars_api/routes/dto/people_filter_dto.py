@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class PersonFilters(BaseModel):
+class PersonFiltersDto(BaseModel):
     name: Optional[str]
     birth_year: Optional[str]
     eye_color: Optional[str]

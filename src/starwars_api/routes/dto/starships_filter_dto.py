@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class StarshipsFilters(BaseModel):
+class StarshipsFiltersDto(BaseModel):
     name: Optional[str]
     model: Optional[str]
     starship_class: Optional[str]
