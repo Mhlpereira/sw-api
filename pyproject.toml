@@ -1,0 +1,24 @@
+[project]
+name = "starwars-api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mario Henrique",email = "mariohenriquelp@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi (>=0.115.14,<0.116.0)",
+    "httpx (>=0.28.1,<0.29.0)"
+]
+
+[tool.poetry]
+packages = [{include = "starwars_api", from = "src"}]
+
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.35.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
