@@ -1,23 +1,23 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 
 class VehicleFilterDto(BaseModel):
-    name: Optional[str]
-    model: Optional[str]
-    vehicle_class: Optional[str]
-    manufacturer: Optional[str]
-    length: Optional[str]
-    cost_in_credits: Optional[str]
-    crew: Optional[str]
-    passengers: Optional[str]
-    max_atmosphering_speed: Optional[str]
-    cargo_capacity: Optional[str]
-    consumables: Optional[str]
-    url: Optional[str]
-    created: Optional[str]
-    edited: Optional[str]
+    name: Optional[str] = None
+    model: Optional[str] = None
+    vehicle_class: Optional[str] = None
+    manufacturer: Optional[str] = None
+    length: Optional[str] = None
+    cost_in_credits: Optional[str] = None
+    crew: Optional[str] = None
+    passengers: Optional[str] = None
+    max_atmosphering_speed: Optional[str] = None
+    cargo_capacity: Optional[str] = None
+    consumables: Optional[str] = None
+    url: Optional[str] = None
+    created: Optional[str] = None
+    edited: Optional[str] = None
     
     #arrays
-    films: Optional[str]
-    pilots: Optional[str]
+    films: Optional[List[str]] = None
+    pilots: Optional[List[str]] = None

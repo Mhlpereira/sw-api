@@ -1,21 +1,21 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class SpeciesFilterDto(BaseModel):
-    name: Optional[str]
-    classification: Optional[str]
-    designation: Optional[str]
-    average_height: Optional[str]
-    average_lifespan: Optional[str]
-    eye_colors: Optional[str]
-    hair_colors: Optional[str]
-    skin_colors: Optional[str]
-    language: Optional[str]
-    homeworld: Optional[str]
-    url: Optional[str]
-    created: Optional[str]
-    edited: Optional[str]
+    name: Optional[str] = None
+    classification: Optional[str] = None
+    designation: Optional[str] = None
+    average_height: Optional[str] = None
+    average_lifespan: Optional[str] = None
+    eye_colors: Optional[str] = None
+    hair_colors: Optional[str] = None
+    skin_colors: Optional[str] = None
+    language: Optional[str] = None
+    homeworld: Optional[str] = None
+    url: Optional[str] = None
+    created: Optional[str] = None
+    edited: Optional[str] = None
     
     # arrays
-    people: Optional[str]
-    films: Optional[str]
+    people: Optional[List[str]] = None
+    films: Optional[List[str]] = None

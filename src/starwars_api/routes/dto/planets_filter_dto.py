@@ -1,20 +1,20 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class SpeciesFilterDto(BaseModel):
-    name: Optional[str]
-    diameter: Optional[str]
-    rotation_period: Optional[str]
-    orbital_period: Optional[str]
-    gravity: Optional[str]
-    population: Optional[str]
-    climate: Optional[str]
-    terrain: Optional[str]
-    surface_water: Optional[str]
-    url: Optional[str]
-    created: Optional[str]
-    edited: Optional[str]
+    name: Optional[str] = None
+    diameter: Optional[str] = None
+    rotation_period: Optional[str] = None
+    orbital_period: Optional[str] = None
+    gravity: Optional[str] = None
+    population: Optional[str] = None
+    climate: Optional[str] = None
+    terrain: Optional[str] = None
+    surface_water: Optional[str] = None
+    url: Optional[str] = None
+    created: Optional[str] = None
+    edited: Optional[str] = None
     
     #arrays
-    residents: Optional[str]
-    films: Optional[str]
+    residents: Optional[List[str]] = None
+    films:  Optional[List[str]] = None

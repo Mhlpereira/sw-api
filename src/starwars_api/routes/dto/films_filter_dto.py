@@ -1,24 +1,24 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 
 class FilmsFilterDto(BaseModel):
-    title: Optional[str]
-    episode_id: Optional[int]
-    opening_crawl: Optional[str]
-    director: Optional[str]
-    producer: Optional[str]
-    release_date: Optional[str]
-    url: Optional[str]
-    created: Optional[str]
-    edited: Optional[str]
+    title: Optional[str] = None
+    episode_id: Optional[int] = None
+    opening_crawl: Optional[str] = None
+    director: Optional[str] = None
+    producer: Optional[str] = None
+    release_date: Optional[str] = None
+    url: Optional[str] = None
+    created: Optional[str] = None
+    edited: Optional[str] = None
     
     #arrays
-    species: Optional[str]
-    starships: Optional[str]
-    vehicles: Optional[str]
-    characters: Optional[str]
-    planets: Optional[str]
+    species: Optional[List[str]] = None
+    starships: Optional[List[str]] = None
+    vehicles: Optional[List[str]] = None
+    characters: Optional[List[str]] = None
+    planets: Optional[List[str]] = None
 
 
 
