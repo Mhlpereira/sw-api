@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
@@ -14,12 +14,10 @@ class FilmsFilterDto(BaseModel):
     edited: Optional[str] = None
     
     #arrays
-    species: Optional[List[str]] = None
-    starships: Optional[List[str]] = None
-    vehicles: Optional[List[str]] = None
-    characters: Optional[List[str]] = None
-    planets: Optional[List[str]] = None
-
-
+    species: Optional[List[HttpUrl]] = None
+    starships: Optional[List[HttpUrl]] = None
+    vehicles: Optional[List[HttpUrl]] = None
+    characters: Optional[List[HttpUrl]] = None
+    planets: Optional[List[HttpUrl]] = None
 
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
@@ -19,5 +19,6 @@ class VehicleFilterDto(BaseModel):
     edited: Optional[str] = None
     
     #arrays
-    films: Optional[List[str]] = None
-    pilots: Optional[List[str]] = None
+    films: Optional[List[HttpUrl]] = None
+    pilots: Optional[List[HttpUrl]] = None
+    

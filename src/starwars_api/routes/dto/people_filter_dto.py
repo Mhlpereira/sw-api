@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
+
 
 class PersonFiltersDto(BaseModel):
     name: Optional[str] = None
@@ -13,10 +14,8 @@ class PersonFiltersDto(BaseModel):
     homeworld: Optional[str] = None
     
     #arrays
-    film: Optional[List[str]] = None
-    species: Optional[List[str]] = None
-    starship: Optional[List[str]] = None
-    vehicle: Optional[List[str]] = None
-            
-
+    film: Optional[List[HttpUrl]] = None
+    species: Optional[List[HttpUrl]] = None
+    starship: Optional[List[HttpUrl]] = None
+    vehicle: Optional[List[HttpUrl]] = None
 

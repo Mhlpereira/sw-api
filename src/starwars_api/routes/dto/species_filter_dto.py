@@ -1,5 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
+
+
+
 
 class SpeciesFilterDto(BaseModel):
     name: Optional[str] = None
@@ -17,5 +20,6 @@ class SpeciesFilterDto(BaseModel):
     edited: Optional[str] = None
     
     # arrays
-    people: Optional[List[str]] = None
-    films: Optional[List[str]] = None
+    people: Optional[List[HttpUrl]] = None
+    films: Optional[List[HttpUrl]] = None
+    
