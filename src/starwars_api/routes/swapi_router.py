@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from ..services.swapi_service import SwapiService
+from fastapi_cache.decorator import cache
 from .dto import (
     FilmsFilterDto,
     PeopleFilterDto,
@@ -14,6 +15,7 @@ router = APIRouter()
 swapi_service = SwapiService()
 
 @router.get("/people")
+@cache(expire=3600, key="peoples")
 async def list_people(filters: PeopleFilterDto = Depends()):
     return await swapi_service.list_people(filters)
 
@@ -22,6 +24,7 @@ async def get_people(person_id: str):
     return await swapi_service.get_people(person_id)
 
 @router.get("/films")
+@cache(expire=3600, key="films")
 async def list_films(filters: FilmsFilterDto = Depends()):
     return await swapi_service.list_films(filters)
 
@@ -30,6 +33,7 @@ async def get_films(film_id: str):
     return await swapi_service.get_films(film_id)
 
 @router.get("/starships")
+@cache(expire=3600, key="starships")
 async def list_starships(filters: StarshipsFilterDto = Depends()):
     return await swapi_service.list_starships(filters)
 
@@ -38,6 +42,7 @@ async def get_starships(starship_id: str):
     return await swapi_service.get_starships(starship_id)
 
 @router.get("/vehicles")
+@cache(expire=3600, key="vehicles")
 async def list_vehicles(filters: VehiclesFilterDto = Depends()):
     return await swapi_service.list_vehicles(filters)
 
@@ -46,6 +51,7 @@ async def get_vehicles(vehicle_id: str):
     return await swapi_service.get_vehicles(vehicle_id)
 
 @router.get("/species")
+@cache(expire=3600, key="species")
 async def list_species(filters: SpeciesFilterDto = Depends()):
     return await swapi_service.list_species(filters)
 
@@ -54,6 +60,7 @@ async def get_species(species_id: str):
     return await swapi_service.get_species(species_id)
 
 @router.get("/planets")
+@cache(expire=3600, key="planets")
 async def list_planets(filters: PlanetsFilterDto = Depends()):
     return await swapi_service.list_planets(filters)
 
