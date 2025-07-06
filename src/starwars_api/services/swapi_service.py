@@ -11,6 +11,7 @@ from starwars_api.routes.dto import (
     StarshipsFilterDto,
     VehiclesFilterDto
 )
+from starwars_api.util.resolve_name_fields import resolve_named_fields
 
 
 class SwapiService:
@@ -31,7 +32,10 @@ async def list_people(self, filters: PeopleFilterDto=None, sort_by: Optional[str
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -40,7 +44,11 @@ async def get_people(self, person_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}people/{person_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -55,7 +63,9 @@ async def list_films(self, filters: FilmsFilterDto=None, sort_by: Optional[str] 
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -64,7 +74,11 @@ async def get_films(self, film_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}films/{film_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -79,7 +93,9 @@ async def list_starships(self, filters: StarshipsFilterDto=None, sort_by: Option
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -88,7 +104,11 @@ async def get_starships(self, starship_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}starships/{starship_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
@@ -103,7 +123,9 @@ async def list_vehicles(self, filters: VehiclesFilterDto=None, sort_by: Optional
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
         
@@ -112,7 +134,11 @@ async def get_vehicles(self, vehicle_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}vehicles/{vehicle_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
@@ -127,7 +153,9 @@ async def list_species(self, filters: SpeciesFilterDto=None, sort_by: Optional[s
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
@@ -136,7 +164,11 @@ async def get_species(self, species_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}species/{species_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
@@ -151,7 +183,9 @@ async def list_planets(self, filters: PlanetsFilterDto=None, sort_by: Optional[s
                 if sort_by:
                     data["results"] = DataSorter.apply_sorting(data["results"], sort_by, order)
                 
-                return data["results"]
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
@@ -160,6 +194,10 @@ async def get_planets(self, planet_id: str):
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.api_url}planets/{planet_id}")
                 response.raise_for_status()
-                return response.json()
+                data = response.json()
+                
+                formatted_results = await resolve_named_fields(data["results"], ["homeworld", "films", "species", "vehicles", "starships"])
+                
+                return formatted_results
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
