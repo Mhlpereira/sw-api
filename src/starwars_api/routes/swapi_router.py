@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from starwars_api.routes.auth_router import authenticate
 from ..services.swapi_service import SwapiService
 from fastapi_cache.decorator import cache
 from .dto import (
@@ -11,7 +12,11 @@ from .dto import (
 )
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/swapi",
+    tags=["swapi"],
+    dependencies=[Depends(authenticate)]  
+)
 swapi_service = SwapiService()
 
 @router.get("/people", status_code=200)
@@ -67,3 +72,4 @@ async def list_planets(filters: PlanetsFilterDto = Depends()):
 @router.get("/planets/{planet_id}", status_code=200)
 async def get_planets(planet_id: str):
     return await swapi_service.get_planets(planet_id)
+

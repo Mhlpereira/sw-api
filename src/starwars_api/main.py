@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import os
 from fastapi import FastAPI
+from starwars_api.auth import auth_router
 from starwars_api.cache import RedisCache
 from dotenv import load_dotenv
 from routes.swapi_router import router as swapi_router
@@ -23,6 +24,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(swapi_router, prefix="/api/v1", tags=["swapi"])
 
 if __name__ == "__main__":
