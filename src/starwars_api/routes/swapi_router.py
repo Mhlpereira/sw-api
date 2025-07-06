@@ -20,7 +20,7 @@ swapi_service = SwapiService()
 
 
 @router.get("/people", status_code=200)
-@cache(expire=3600)
+# @cache(expire=3600)
 async def list_people(filters: PeopleFilterDto = Depends()):
     return await swapi_service.list_people(filters)
 

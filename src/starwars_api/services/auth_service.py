@@ -8,7 +8,6 @@ from jose import JWTError, jwt
 
 load_dotenv()
 
-# HTTPBearer para autenticação via token Bearer
 security = HTTPBearer()
 
 

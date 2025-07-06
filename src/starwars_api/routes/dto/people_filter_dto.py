@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class PeopleFilterDto(BaseModel):
@@ -12,10 +13,9 @@ class PeopleFilterDto(BaseModel):
     mass: Optional[str] = None
     skin_color: Optional[str] = None
     homeworld: Optional[str] = None
-    
+
     # Para arrays, usar strings separadas por vírgula como query params
     film: Optional[str] = None
     species: Optional[str] = None
     starship: Optional[str] = None
     vehicle: Optional[str] = None
-
