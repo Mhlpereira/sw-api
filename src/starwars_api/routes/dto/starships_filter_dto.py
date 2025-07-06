@@ -3,7 +3,7 @@ from typing import List, Optional
 
 
 
-class StarshipsFiltersDto(BaseModel):
+class StarshipsFilterDto(BaseModel):
     name: Optional[str] = None
     model: Optional[str] = None
     starship_class: Optional[str] = None

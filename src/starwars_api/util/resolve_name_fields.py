@@ -2,7 +2,7 @@
 from starwars_api.util.naming import url_to_name
 
 
-async def resolve_named_fields(data: dict, fields: list[str]) -> dict:
+async def resolve_name_fields(data: dict, fields: list[str]) -> dict:
     for field in fields:
         if field in data:
             if isinstance(data[field], list):

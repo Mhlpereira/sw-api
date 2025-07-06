@@ -3,7 +3,7 @@ from typing import List, Optional
 
 
 
-class SpeciesFilterDto(BaseModel):
+class PlanetsFilterDto(BaseModel):
     name: Optional[str] = None
     diameter: Optional[str] = None
     rotation_period: Optional[str] = None

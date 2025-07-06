@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
-class VehicleFilterDto(BaseModel):
+class VehiclesFilterDto(BaseModel):
     name: Optional[str] = None
     model: Optional[str] = None
     vehicle_class: Optional[str] = None

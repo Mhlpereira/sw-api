@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
-class PersonFiltersDto(BaseModel):
+class PeopleFilterDto(BaseModel):
     name: Optional[str] = None
     birth_year: Optional[str] = None
     eye_color: Optional[str] = None

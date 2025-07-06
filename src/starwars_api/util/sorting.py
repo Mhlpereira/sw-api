@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Optional
 
 from starwars_api.enums.order_enum import Order
