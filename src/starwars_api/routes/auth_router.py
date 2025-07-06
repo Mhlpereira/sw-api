@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from starwars_api.services.auth_service import AuthService
 
 router = APIRouter(
@@ -9,6 +10,7 @@ router = APIRouter(
 
 auth_service = AuthService()
 
-@router.post("/auth", status_code=201)
+
+@router.post("/auth", status_code=201, summary="Generate JWT Token")
 async def authenticate():
-    return await auth_service.authenticate()
+    return await auth_service.generate_token()

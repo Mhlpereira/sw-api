@@ -1,15 +1,17 @@
-from contextlib import asynccontextmanager
 import os
-from fastapi import FastAPI
-from starwars_api.cache import RedisCache
+from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
-from starwars_api.routes import auth_router, swapi_router
+from fastapi import FastAPI
 
-
+from starwars_api.cache import RedisCache
+from starwars_api.routes.auth_router import router as auth_router
+from starwars_api.routes.swapi_router import router as swapi_router
 
 load_dotenv()
 
-redis_cache = RedisCache(os.getenv("REDIS_URL"))
+redis_cache = RedisCache(os.getenv("REDIS_URL", "redis://localhost:6379"))
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,10 +27,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
-app.include_router(swapi_router, prefix="/api/v1", tags=["swapi"])
+app.include_router(auth_router)
+app.include_router(swapi_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import Optional
 
 
 
@@ -22,6 +22,6 @@ class StarshipsFilterDto(BaseModel):
     edited: Optional[str] = None
     
     #arrays
-    films: Optional[List[HttpUrl]] = None
-    pilots: Optional[List[HttpUrl]] = None
+    films: Optional[str] = None
+    pilots: Optional[str] = None
     

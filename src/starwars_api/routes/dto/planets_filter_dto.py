@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import Optional
 
 
 
@@ -18,5 +18,5 @@ class PlanetsFilterDto(BaseModel):
     edited: Optional[str] = None
     
     #arrays
-    residents: Optional[List[HttpUrl]] = None
-    films:  Optional[List[HttpUrl]] = None
+    residents: Optional[str] = None
+    films:  Optional[str] = None

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import Optional
 
 
 class PeopleFilterDto(BaseModel):
@@ -13,9 +13,9 @@ class PeopleFilterDto(BaseModel):
     skin_color: Optional[str] = None
     homeworld: Optional[str] = None
     
-    #arrays
-    film: Optional[List[HttpUrl]] = None
-    species: Optional[List[HttpUrl]] = None
-    starship: Optional[List[HttpUrl]] = None
-    vehicle: Optional[List[HttpUrl]] = None
+    # Para arrays, usar strings separadas por vírgula como query params
+    film: Optional[str] = None
+    species: Optional[str] = None
+    starship: Optional[str] = None
+    vehicle: Optional[str] = None
 

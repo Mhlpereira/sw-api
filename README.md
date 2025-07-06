@@ -1,7 +1,7 @@
 
 Este projeto utiliza Python e FastAPI para consumir e disponibilizar dados públicos da API oficial do Star Wars (SWAPI).
 
-Necessário poetry para executar poetry, python
+Necessário poetry para executar poetry, python, docker
 
 
 ## Sorting 
@@ -29,3 +29,13 @@ JWT_SECRET_KEY=73d05dcc678b110cdcca8f9f2c09316629615527b9e30e93a4b25c45a4d291fa2
 ```
 
 Não estou colocando ele no gitignore por não ter nenhum dado sensível e para executar os testes
+
+## Redis & Docker
+
+Estou utilizando cache para evitar vários requests e para trocar a resposta em url pelo nome 
+
+Temos que subir um container docker para utilizar o redis
+
+```
+docker compose up -d
+```

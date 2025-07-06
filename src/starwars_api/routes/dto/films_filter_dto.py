@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import Optional
 
 
 class FilmsFilterDto(BaseModel):
@@ -13,11 +13,11 @@ class FilmsFilterDto(BaseModel):
     created: Optional[str] = None
     edited: Optional[str] = None
     
-    #arrays
-    species: Optional[List[HttpUrl]] = None
-    starships: Optional[List[HttpUrl]] = None
-    vehicles: Optional[List[HttpUrl]] = None
-    characters: Optional[List[HttpUrl]] = None
-    planets: Optional[List[HttpUrl]] = None
+    # Para arrays, usar strings separadas por vírgula como query params
+    species: Optional[str] = None
+    starships: Optional[str] = None
+    vehicles: Optional[str] = None
+    characters: Optional[str] = None
+    planets: Optional[str] = None
 
 
