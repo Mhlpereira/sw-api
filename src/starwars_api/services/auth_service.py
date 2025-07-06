@@ -9,8 +9,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
 class AuthService:
-    def __init__(self, auth_url: str):
-        self.auth_url = auth_url
+   
+        
 
     async def generate_token():
         payload = {

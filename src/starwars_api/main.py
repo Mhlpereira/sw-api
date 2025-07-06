@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
 import os
 from fastapi import FastAPI
-from starwars_api.auth import auth_router
+from starwars_api.routes import auth_router
 from starwars_api.cache import RedisCache
 from dotenv import load_dotenv
-from routes.swapi_router import router as swapi_router
+from starwars_api.routes import router as swapi_router
 
 load_dotenv()
 
