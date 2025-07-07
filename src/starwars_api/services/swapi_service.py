@@ -38,7 +38,6 @@ class SwapiService:
         resource_id: Optional[str] = None,
         filters: Optional[BaseModel] = None,
     ):
-        """Gera chave única para cache"""
         key_parts = [endpoint]
         if resource_id:
             key_parts.append(resource_id)
