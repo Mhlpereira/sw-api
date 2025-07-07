@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from fastapi_cache.decorator import cache
 
 from starwars_api.services.auth_service import get_current_user
 
@@ -20,7 +19,6 @@ swapi_service = SwapiService()
 
 
 @router.get("/people", status_code=200)
-# @cache(expire=3600)
 async def list_people(filters: PeopleFilterDto = Depends()):
     return await swapi_service.list_people(filters)
 
@@ -31,7 +29,6 @@ async def get_people(person_id: str):
 
 
 @router.get("/films", status_code=200)
-@cache(expire=3600)
 async def list_films(filters: FilmsFilterDto = Depends()):
     return await swapi_service.list_films(filters)
 
@@ -42,7 +39,6 @@ async def get_films(film_id: str):
 
 
 @router.get("/starships", status_code=200)
-@cache(expire=3600)
 async def list_starships(filters: StarshipsFilterDto = Depends()):
     return await swapi_service.list_starships(filters)
 
@@ -53,7 +49,6 @@ async def get_starships(starship_id: str):
 
 
 @router.get("/vehicles", status_code=200)
-@cache(expire=3600)
 async def list_vehicles(filters: VehiclesFilterDto = Depends()):
     return await swapi_service.list_vehicles(filters)
 
@@ -64,7 +59,6 @@ async def get_vehicles(vehicle_id: str):
 
 
 @router.get("/species", status_code=200)
-@cache(expire=3600)
 async def list_species(filters: SpeciesFilterDto = Depends()):
     return await swapi_service.list_species(filters)
 
@@ -75,7 +69,6 @@ async def get_species(species_id: str):
 
 
 @router.get("/planets", status_code=200)
-@cache(expire=3600)
 async def list_planets(filters: PlanetsFilterDto = Depends()):
     return await swapi_service.list_planets(filters)
 

@@ -1,16 +1,10 @@
-import os
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from starwars_api.cache import RedisCache
+from starwars_api.cache import redis_cache
 from starwars_api.routes.auth_router import router as auth_router
 from starwars_api.routes.swapi_router import router as swapi_router
-
-load_dotenv()
-
-redis_cache = RedisCache(os.getenv("REDIS_URL", "redis://localhost:6379"))
 
 
 @asynccontextmanager

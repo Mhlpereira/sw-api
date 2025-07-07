@@ -1,9 +1,11 @@
+import json
 from typing import Optional
 
 import httpx
 from fastapi import HTTPException
 from pydantic import BaseModel
 
+from starwars_api.cache import redis_cache
 from starwars_api.enums.order_enum import Order
 from starwars_api.routes.dto import (
     FilmsFilterDto,
@@ -30,13 +32,35 @@ class SwapiService:
     def __init__(self):
         self.api_url = "https://swapi.info/api/"
 
+    async def _get_cache_key(
+        self,
+        endpoint: str,
+        resource_id: Optional[str] = None,
+        filters: Optional[BaseModel] = None,
+    ):
+        """Gera chave única para cache"""
+        key_parts = [endpoint]
+        if resource_id:
+            key_parts.append(resource_id)
+        if filters:
+            filter_dict = filters.model_dump(exclude_none=True)
+            if filter_dict:
+                key_parts.append(json.dumps(filter_dict, sort_keys=True))
+        return ":".join(key_parts)
+
     async def _make_request(
         self,
         endpoint: str,
         resource_id: Optional[str] = None,
         filters: Optional[BaseModel] = None,
     ):
-        """Método privado para fazer requisições genéricas"""
+        """Método privado para fazer requisições genéricas com cache"""
+        cache_key = await self._get_cache_key(endpoint, resource_id, filters)
+
+        cached_data = await redis_cache.get(cache_key)
+        if cached_data:
+            return cached_data
+
         api_params = filters.model_dump(exclude_none=True) if filters else {}
         url = f"{self.api_url}{endpoint}"
         if resource_id:
@@ -45,7 +69,10 @@ class SwapiService:
         async with httpx.AsyncClient() as client:
             response = await client.get(url, params=api_params)
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+
+            await redis_cache.set(cache_key, data, expire=3600)
+            return data
 
     async def _process_response(
         self,
@@ -54,7 +81,6 @@ class SwapiService:
         sort_by: Optional[str] = None,
         order: Order = Order.ASC,
     ):
-        """Processa a resposta da API"""
         if isinstance(data, list):
             if sort_by:
                 data = DataSorter.sort(data, sort_by, order)
@@ -77,18 +103,40 @@ class SwapiService:
         sort_by: Optional[str] = None,
         order: Order = Order.ASC,
     ):
-        """Método genérico para listar recursos"""
         try:
+            processed_cache_key = await self._get_cache_key(
+                f"{endpoint}_processed", None, filters
+            )
+            if sort_by:
+                processed_cache_key += f":sort:{sort_by}:{order.value}"
+
+            cached_processed = await redis_cache.get(processed_cache_key)
+            if cached_processed:
+                return cached_processed
+
             data = await self._make_request(endpoint, None, filters)
-            return await self._process_response(data, endpoint, sort_by, order)
+            result = await self._process_response(data, endpoint, sort_by, order)
+
+            await redis_cache.set(processed_cache_key, result, expire=1800)
+
+            return result
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
     async def get_resource(self, endpoint: str, resource_id: str):
-        """Método genérico para obter um recurso específico"""
         try:
+            processed_cache_key = f"{endpoint}_{resource_id}_processed"
+
+            cached_processed = await redis_cache.get(processed_cache_key)
+            if cached_processed:
+                return cached_processed
+
             data = await self._make_request(endpoint, resource_id)
-            return await self._process_response(data, endpoint)
+            result = await self._process_response(data, endpoint)
+
+            await redis_cache.set(processed_cache_key, result, expire=1800)
+
+            return result
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, detail=str(e))
 
