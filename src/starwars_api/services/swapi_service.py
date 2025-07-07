@@ -53,7 +53,6 @@ class SwapiService:
         resource_id: Optional[str] = None,
         filters: Optional[BaseModel] = None,
     ):
-        """Método privado para fazer requisições genéricas com cache"""
         cache_key = await self._get_cache_key(endpoint, resource_id, filters)
 
         cached_data = await redis_cache.get(cache_key)

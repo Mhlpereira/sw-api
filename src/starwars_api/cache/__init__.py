@@ -1,8 +1,4 @@
-from .cache import RedisCache
+from starwars_api.cache.cache_instance import redis_cache
+from starwars_api.cache.warmup_service import CacheWarmupService
 
-try:
-    from .cache_instance import redis_cache
-
-    __all__ = ["RedisCache", "redis_cache"]
-except ImportError:
-    __all__ = ["RedisCache"]
+__all__ = ["redis_cache", "cache_warmup_service"]
