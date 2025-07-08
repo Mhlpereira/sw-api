@@ -17,13 +17,11 @@ class TestUrlToName:
         mock_cache = AsyncMock()
         mock_cache.get.side_effect = ["Luke Skywalker"]
 
-        with patch(
-            "starwars_api.util.naming.FastAPICache.get_backend", return_value=mock_cache
-        ):
+        with patch("starwars_api.util.naming.redis_cache", mock_cache):
             result = await url_to_name(urls)
 
         assert result == ["Luke Skywalker"]
-        mock_cache.get.assert_called_once_with("name:https://swapi.info/api/people/1")
+        mock_cache.get.assert_called_with("name:https://swapi.info/api/people/1")
 
     @pytest.mark.asyncio
     async def test_url_to_name_cache_hit_data_cache(self):

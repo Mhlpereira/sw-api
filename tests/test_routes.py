@@ -37,7 +37,7 @@ class TestAuthRouter:
         }
 
         with patch(
-            "starwars_api.routes.auth_router.cache_warmup_service.warm_up_cache"
+            "starwars_api.cache.warmup_service.cache_warmup_service.warm_up_cache"
         ) as mock_warmup:
             mock_warmup.return_value = mock_result
 
@@ -53,7 +53,7 @@ class TestAuthRouter:
         mock_result = {"message": "Cache warming failed", "error": "Connection error"}
 
         with patch(
-            "starwars_api.routes.auth_router.cache_warmup_service.warm_up_cache"
+            "starwars_api.cache.warmup_service.cache_warmup_service.warm_up_cache"
         ) as mock_warmup:
             mock_warmup.return_value = mock_result
 
@@ -78,7 +78,7 @@ class TestSwapiRouter:
 
     @pytest.fixture
     def mock_auth(self):
-        with patch("starwars_api.routes.swapi_router.get_current_user") as mock:
+        with patch("starwars_api.services.auth_service.get_current_user") as mock:
             mock.return_value = {"sub": "starwars_api_user", "role": "user"}
             yield mock
 
@@ -255,7 +255,7 @@ class TestSwapiRouter:
     def test_invalid_token_access(self, client):
         invalid_token = "Bearer invalid_token"
 
-        with patch("starwars_api.routes.swapi_router.get_current_user") as mock_auth:
+        with patch("starwars_api.services.auth_service.get_current_user") as mock_auth:
             mock_auth.side_effect = Exception("Invalid token")
 
             response = client.get(
