@@ -4,12 +4,14 @@ from fastapi import FastAPI
 
 from starwars_api.cache import redis_cache
 from starwars_api.routes.auth_router import router as auth_router
+from starwars_api.routes.auth_router import warm_cache
 from starwars_api.routes.swapi_router import router as swapi_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_cache.connect()
+    await warm_cache()
     yield
     await redis_cache.disconnect()
 

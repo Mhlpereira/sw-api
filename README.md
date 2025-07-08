@@ -4,6 +4,9 @@ Este projeto utiliza Python e FastAPI para consumir e disponibilizar dados públ
 Necessário poetry para executar poetry, python, docker
 
 
+poetry run uvicorn src.starwars_api.main:app --host 0.0.0.0 --port 8000 --reload
+
+
 ## Sorting 
 
 ```
