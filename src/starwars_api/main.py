@@ -26,6 +26,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(swapi_router, prefix="/api/v1")
 
+
 if __name__ == "__main__":
     import uvicorn
 
