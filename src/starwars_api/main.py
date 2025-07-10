@@ -6,6 +6,7 @@ from starwars_api.cache import redis_cache
 from starwars_api.routes.auth_router import router as auth_router
 from starwars_api.routes.auth_router import warm_cache
 from starwars_api.routes.swapi_router import router as swapi_router
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -28,7 +29,7 @@ app = FastAPI(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return JSONResponse(content={"status": "ready"}, status_code=200)
 
 app.include_router(auth_router)
 app.include_router(swapi_router)
