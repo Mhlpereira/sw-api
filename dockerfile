@@ -1,21 +1,19 @@
-FROM python:3.9-slim as builder
+FROM python:3.10-slim
 
 WORKDIR /app
 ENV PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/src:$PYTHONPATH"
 
 RUN pip install poetry
 
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-dev --no-root
+RUN poetry config virtualenvs.create false && \
+    poetry lock && \
+    poetry install --only=main --no-root
 
-FROM python:3.9-slim
+COPY ./src ./src
 
-WORKDIR /app
-COPY --from=builder /app/.venv /app/.venv
-COPY ./app ./app
-
-ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "starwars_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
