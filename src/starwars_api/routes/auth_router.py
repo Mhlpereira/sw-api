@@ -4,7 +4,7 @@ from starwars_api.cache.warmup_service import cache_warmup_service
 from starwars_api.services.auth_service import AuthService
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/",
     tags=["Authentication"],
 )
 
@@ -21,3 +21,7 @@ async def authenticate():
 @router.post("/warm-cache", status_code=200, summary="Warm up cache")
 async def warm_cache():
     return await cache_warmup_service.warm_up_cache()
+
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}

@@ -78,8 +78,8 @@ curl -H "Authorization: Bearer <seu_token>" http://localhost:8000/api/v1/swapi/p
 ## 🔗 Endpoints Principais
 
 ### Autenticação
-- `POST /auth/auth` - Gerar token JWT
-- `POST /auth/warm-cache` - Aquecer cache (opcional)
+- `POST /auth` - Gerar token JWT
+- `POST /warm-cache` - Aquecer cache (opcional)
 
 ### SWAPI Endpoints (requerem autenticação)
 - `GET /api/v1/swapi/people` - Listar pessoas
@@ -150,11 +150,8 @@ curl -X POST http://localhost:8000/auth/warm-cache
 ### Variáveis de Ambiente (.env)
 
 ```bash
-# Redis (desenvolvimento local)
-REDIS_URL="redis://localhost:6379"
 
-# Redis (Docker Compose)
-REDIS_URL="redis://redis:6379"
+REDIS_URL="redis://localhost:6379"
 
 # JWT Secret Key
 JWT_SECRET_KEY=73d05dcc678b110cdcca8f9f2c09316629615527b9e30e93a4b25c45a4d291fa222268248acc68fea40c8362d8aab8d481daa958de71d8b4e6039bccd9da6a4d
