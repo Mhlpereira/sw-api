@@ -31,7 +31,7 @@ def health_check():
     return {"status": "ok"}
 
 app.include_router(auth_router)
-app.include_router(swapi_router, prefix="/api/v1")
+app.include_router(swapi_router)
 
 
 if __name__ == "__main__":
