@@ -10,8 +10,11 @@ from starwars_api.routes.swapi_router import router as swapi_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await redis_cache.connect()
-    await warm_cache()
+    try:
+        await redis_cache.connect()
+        await warm_cache()
+    except Exception as e:
+        print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield
     await redis_cache.disconnect()
 
@@ -22,6 +25,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 app.include_router(auth_router)
 app.include_router(swapi_router, prefix="/api/v1")
