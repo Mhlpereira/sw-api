@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.venv/
+venv/
+
+# Dependências e build
+poetry.lock
+pyproject.toml
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# Logs e temp
+*.log
+*.swp
+*.swo
+.DS_Store

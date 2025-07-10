@@ -19,7 +19,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false && \
     poetry install --only=main --no-root
 
-COPY ./src ./src
+COPY . .
 
 EXPOSE 8080
 
