@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
@@ -13,10 +13,12 @@ security = HTTPBearer()
 
 class AuthService:
     async def generate_token(self):
+        now = datetime.now(timezone.utc)
+        exp = now + timedelta(hours=1)
         payload = {
             "sub": "starwars_api_user",
-            "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(hours=1),
+            "iat": int(now.timestamp()),
+            "exp": int(exp.timestamp()), 
             "role": "user",
         }
 
@@ -35,6 +37,14 @@ async def get_current_user(
         payload = jwt.decode(
             token, os.getenv("JWT_SECRET_KEY", "your_secret_key"), algorithms=["HS256"]
         )
+
+        if payload.get("exp") < int(datetime.utcnow().timestamp()):
+            raise HTTPException(
+                status_code=401,
+                detail="Token expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
         return payload
     except JWTError:
         raise HTTPException(
