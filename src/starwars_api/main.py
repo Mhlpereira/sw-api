@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 import os
 
@@ -13,7 +14,7 @@ from fastapi.responses import JSONResponse
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        await redis_cache.connect()
+        await asyncio.wait_for(redis_cache.connect(), timeout=10.0)
     except Exception as e:
         print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield
