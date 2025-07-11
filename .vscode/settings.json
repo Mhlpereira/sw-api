@@ -21,4 +21,5 @@
     "ruff.enable": true,
     "ruff.organizeImports": true,
     "ruff.fixAll": true,
+    "git.ignoreLimitWarning": true,
 }

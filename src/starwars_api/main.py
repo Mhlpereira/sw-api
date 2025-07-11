@@ -18,7 +18,10 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield
-    await redis_cache.disconnect()
+    try:
+        await redis_cache.disconnect()
+    except Exception as e:
+        print(f"Warning: Redis disconnect error: {e}")
 
 
 app = FastAPI(
