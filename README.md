@@ -10,7 +10,7 @@ Um gateway foi implementado como camada intermediária entre os clientes e os se
 ## 🧭 Como Usar
 Para começar a utilizar a API, siga os passos abaixo:
 
-1. 🔥 Faça o Warm-Up do Cache
+### 1. 🔥 Faça o Warm-Up do Cache
 Antes de realizar consultas, é recomendável popular o cache com todos os dados da SWAPI para garantir desempenho máximo e respostas legíveis com nomes em vez de URLs.
 
 ```
@@ -20,13 +20,13 @@ curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/warm-cache
 
 Esse processo:
 
-Pré-carrega os dados da API pública no Redis
+ - Pré-carrega os dados da API pública no Redis
 
-Resolve automaticamente as URLs em nomes legíveis
+ - Resolve automaticamente as URLs em nomes legíveis
 
-Reduz significativamente a latência das próximas requisições
+ - Reduz significativamente a latência das próximas requisições
 
-2. 🔐 Gere um Token de Autenticação (JWT)
+### 2. 🔐 Gere um Token de Autenticação (JWT)
 A maioria dos endpoints requer autenticação. Para isso, gere um token JWT:
 
 ```
@@ -46,14 +46,14 @@ Resposta:
 
 Copie o valor do access_token.
 
-3. 📡 Faça Requisições Autenticadas
+### 3. 📡 Faça Requisições Autenticadas
 Agora que você tem um token JWT, use-o no header Authorization das suas requisições:
 ```
 curl -H "Authorization: Bearer <seu_token>" https://swapi-gateway-9gaiurpg.uc.gateway.dev/swapi/people
 Você pode acessar qualquer endpoint da API (pessoas, filmes, planetas etc.) da mesma forma, sempre com o token no header.
 ```
 
-4. 🔄 Resultado com Resolução de Nomes
+### 4. 🔄 Resultado com Resolução de Nomes
 Graças ao warm-up e à lógica de cache inteligente, a resposta da API já virá com nomes resolvidos, como:
 ```
 {
