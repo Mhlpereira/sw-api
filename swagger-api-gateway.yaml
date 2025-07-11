@@ -3,7 +3,7 @@ info:
   title: Star Wars API Gateway
   description: API Gateway para o Star Wars API no Cloud Run
   version: 1.0.0
-host: YOUR_GATEWAY_HOST.googleapis.com
+host: swapi-gateway-9gaiurpg.uc.gateway.dev
 schemes:
   - https
 securityDefinitions:
@@ -40,6 +40,7 @@ paths:
       operationId: warm_cache
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/warm-cache
+        deadline: 300.0
       responses:
         '200':
           description: Cache warmed successfully
@@ -51,6 +52,7 @@ paths:
       operationId: list_people
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/people
+        deadline: 120.0
       parameters:
         - name: name
           in: query
@@ -103,6 +105,7 @@ paths:
       operationId: get_person
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/people/{person_id}
+        deadline: 120.0
       parameters:
         - name: person_id
           in: path
@@ -120,6 +123,7 @@ paths:
       operationId: list_films
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/films
+        deadline: 120.0
       parameters:
         - name: title
           in: query
@@ -160,6 +164,7 @@ paths:
       operationId: get_film
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/films/{film_id}
+        deadline: 120.0
       parameters:
         - name: film_id
           in: path
@@ -177,6 +182,7 @@ paths:
       operationId: list_starships
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/starships
+        deadline: 120.0
       parameters:
         - name: name
           in: query
@@ -249,6 +255,7 @@ paths:
       operationId: get_starship
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/starships/{starship_id}
+        deadline: 120.0
       parameters:
         - name: starship_id
           in: path
@@ -266,6 +273,7 @@ paths:
       operationId: list_vehicles
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/vehicles
+        deadline: 120.0
       parameters:
         - name: name
           in: query
@@ -330,6 +338,7 @@ paths:
       operationId: get_vehicle
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/vehicles/{vehicle_id}
+        deadline: 120.0
       parameters:
         - name: vehicle_id
           in: path
@@ -347,6 +356,7 @@ paths:
       operationId: list_species
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/species
+        deadline: 120.0
       parameters:
         - name: name
           in: query
@@ -403,6 +413,7 @@ paths:
       operationId: get_species
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/species/{species_id}
+        deadline: 120.0
       parameters:
         - name: species_id
           in: path
@@ -420,6 +431,7 @@ paths:
       operationId: list_planets
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/planets
+        deadline: 120.0
       parameters:
         - name: name
           in: query
@@ -476,6 +488,7 @@ paths:
       operationId: get_planet
       x-google-backend:
         address: https://sw-api-740742324676.us-central1.run.app/swapi/planets/{planet_id}
+        deadline: 120.0
       parameters:
         - name: planet_id
           in: path
