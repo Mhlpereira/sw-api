@@ -1,11 +1,15 @@
 
 # Star Wars API Gateway
 
-Um gateway moderno para a API pública do Star Wars (SWAPI) construído com **FastAPI** e hospedado no **Google Cloud Platform**. O sistema consome dados da API oficial do SWAPI e oferece funcionalidades avançadas de cache, autenticação JWT e resolução inteligente de URLs.
+Uma API construída com FastAPI, que consome dados da API pública do swapi.info. O sistema utiliza Redis para cache eficiente, reduzindo a latência e a carga sobre a API original. Implementa resolução inteligente de URLs, convertendo links brutos em nomes legíveis e informativos.
+
+O deploy foi realizado no Cloud Run (GCP), garantindo escalabilidade automática e baixo custo operacional. O Redis está hospedado em uma VM dedicada, separando a camada de cache para melhor desempenho e controle.
+
+Um gateway foi implementado como camada intermediária entre os clientes e os serviços internos, permitindo maior segurança, centralização de autenticação com JWT, controle de tráfego e fácil aplicação de políticas de rate limit e logging.
 
 ## 🌐 Acesso via API Gateway
 
-**Base URL**: `https://YOUR_GATEWAY_HOST.googleapis.com`
+**Base URL**: `https://swapi-gateway-9gaiurpg.uc.gateway.dev`
 
 A API está disponível através do Google Cloud API Gateway e pode ser acessada diretamente pelos endpoints públicos configurados.
 
@@ -69,7 +73,7 @@ poetry run uvicorn src.starwars_api.main:app --host 0.0.0.0 --port 8000 --reload
 Faça uma requisição POST através do API Gateway para obter o token JWT:
 
 ```bash
-curl -X POST https://YOUR_GATEWAY_HOST.googleapis.com/auth
+curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/auth
 ```
 
 **Resposta:**
@@ -85,7 +89,7 @@ curl -X POST https://YOUR_GATEWAY_HOST.googleapis.com/auth
 Inclua o token no header `Authorization` de todas as requisições para endpoints protegidos:
 
 ```bash
-curl -H "Authorization: Bearer <seu_token>" https://YOUR_GATEWAY_HOST.googleapis.com/swapi/people
+curl -H "Authorization: Bearer <seu_token>" https://swapi-gateway-9gaiurpg.uc.gateway.dev/swapi/people
 ```
 
 ## 🔗 Endpoints do API Gateway
@@ -175,7 +179,7 @@ O sistema utiliza **Redis** hospedado em VM no GCP para otimizar performance:
 #### 🚀 Warm-up do Cache (Recomendado)
 ```bash
 # Popular cache com todos os dados da SWAPI
-curl -X POST https://YOUR_GATEWAY_HOST.googleapis.com/warm-cache
+curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/warm-cache
 ```
 
 **Benefícios do warm-up:**
@@ -370,12 +374,12 @@ poetry run pytest --cov=src/starwars_api --cov-report=html
 
 ### Swagger UI (Recomendado)
 ```
-https://YOUR_GATEWAY_HOST.googleapis.com/docs
+https://swapi-gateway-9gaiurpg.uc.gateway.dev/docs
 ```
 
 ### ReDoc (Alternativa)
 ```
-https://YOUR_GATEWAY_HOST.googleapis.com/redoc
+https://swapi-gateway-9gaiurpg.uc.gateway.dev/redoc
 ```
 
 ### Documentação Local (Desenvolvimento)
