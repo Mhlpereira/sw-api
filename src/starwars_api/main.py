@@ -14,7 +14,6 @@ from fastapi.responses import JSONResponse
 async def lifespan(app: FastAPI):
     try:
         await redis_cache.connect()
-        await warm_cache()
     except Exception as e:
         print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield

@@ -21,7 +21,7 @@ RUN poetry config virtualenvs.create false && \
 
 COPY . .
 
-EXPOSE $PORT
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=300s --start-period=240s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
