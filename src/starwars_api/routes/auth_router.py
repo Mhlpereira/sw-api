@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter
 
 from starwars_api.cache.warmup_service import cache_warmup_service
@@ -22,3 +23,10 @@ async def authenticate():
 async def warm_cache():
     return await cache_warmup_service.warm_up_cache()
 
+@router.get("/debug-env")
+async def debug_env():
+    return {
+        "JWT_SECRET_KEY": os.getenv("JWT_SECRET_KEY", "NOT_FOUND")[:20] + "...",  # Só os primeiros 20 chars
+        "REDIS_URL": os.getenv("REDIS_URL", "NOT_FOUND")[:20] + "...",
+        "env_loaded": "JWT_SECRET_KEY" in os.environ
+    }
