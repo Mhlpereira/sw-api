@@ -5,6 +5,11 @@ on:
     branches:
       - master
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO_NAME: swapi
+  LAMBDA_FUNCTION: swapi-function
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,21 +23,20 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to ECR
-        id: ecr-login
-        uses: aws-actions/amazon-ecr-login@v1
+        id: ecr-login  # ID que você referencia depois
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag and push image
+      - name: Build and Push
         run: |
-          docker build -t swapi .
-          docker tag swapi-lambda:latest 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest
-          docker push 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest
+          docker build -t ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME }} .
+          docker push ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME }}:latest
 
-      - name: Update Lambda function
+      - name: Update Lambda
         run: |
           aws lambda update-function-code \
-            --function-name swapi-function \
-            --image-uri 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest \
-            --region us-east-1
+            --function-name ${{ env.LAMBDA_FUNCTION }} \
+            --image-uri ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME }}:latest \
+            --region ${{ env.AWS_REGION }}
