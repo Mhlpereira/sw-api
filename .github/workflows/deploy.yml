@@ -3,45 +3,36 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
-    name: Build and Deploy Lambda
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          python-version: "3.10"
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      - name: Instalar Poetry
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag and push image
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          docker build -t swapi .
+          docker tag swapi-lambda:latest 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest
+          docker push 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest
 
-      - name: Instalar dependências
+      - name: Update Lambda function
         run: |
-          poetry install
-          poetry export -f requirements.txt --without-hashes > requirements.txt
-
-      - name: Criar pacote Lambda (deployment.zip)
-        run: |
-          mkdir -p package
-          pip install -r requirements.txt -t package
-          cp -r src/starwars_api/* package/
-          cd package
-          zip -r ../deployment.zip .
-
-      - name: Deploy na AWS Lambda
-        uses: appleboy/lambda-action@master
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: sa-east-1  # Use sua região desejada
-          function_name: swapi-lambda  # Nome da função no Lambda
-          zip_file: deployment.zip
+          aws lambda update-function-code \
+            --function-name swapi-function \
+            --image-uri 134087896061.dkr.ecr.us-east-1.amazonaws.com/swapi-lambda:latest \
+            --region us-east-1

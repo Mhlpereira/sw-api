@@ -14,6 +14,7 @@ from mangum import Mangum
 
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
