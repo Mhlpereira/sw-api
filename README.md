@@ -584,35 +584,6 @@ redis-cli ping
 - Queries de banco eficientes
 - Compressão de responses
 
-## 📈 Roadmap
-
-### Próximas Funcionalidades
-- [ ] GraphQL interface
-- [ ] Webhook notifications
-- [ ] Advanced analytics
-- [ ] Multi-region cache
-- [ ] Real-time updates
-
-### Melhorias Planejadas
-- [ ] Kubernetes deployment
-- [ ] Prometheus metrics
-- [ ] Distributed tracing
-- [ ] Advanced caching strategies
-
-## 🤝 Contribuição
-
-### Como Contribuir
-1. Fork do repositório
-2. Crie uma branch para sua feature
-3. Implemente com testes
-4. Abra Pull Request
-
-### Padrões de Código
-- Python: PEP 8
-- Testes: pytest
-- Documentação: docstrings
-- Commits: conventional commits
-
 ## 📝 Notas Importantes
 
 ### Desenvolvimento
@@ -628,7 +599,3 @@ redis-cli ping
 
 ### Licença
 Este projeto está sob licença MIT. Veja o arquivo LICENSE para detalhes.
-
----
-
-**Construído com ❤️ usando FastAPI, Redis, Docker e Google Cloud Platform**
