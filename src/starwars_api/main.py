@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 import os
+from xml.sax import handler
 
 from fastapi import FastAPI
 
@@ -9,6 +10,8 @@ from starwars_api.routes.auth_router import router as auth_router
 from starwars_api.routes.auth_router import warm_cache
 from starwars_api.routes.swapi_router import router as swapi_router
 from fastapi.responses import JSONResponse
+from mangum import Mangum
+
 
 
 @asynccontextmanager
@@ -38,6 +41,7 @@ def health_check():
 app.include_router(auth_router)
 app.include_router(swapi_router)
 
+handler = Mangum(app)
 
 if __name__ == "__main__":
     import uvicorn

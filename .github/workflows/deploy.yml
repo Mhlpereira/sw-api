@@ -1,0 +1,47 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build and Deploy Lambda
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Instalar Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Instalar dependências
+        run: |
+          poetry install
+          poetry export -f requirements.txt --without-hashes > requirements.txt
+
+      - name: Criar pacote Lambda (deployment.zip)
+        run: |
+          mkdir -p package
+          pip install -r requirements.txt -t package
+          cp -r src/starwars_api/* package/
+          cd package
+          zip -r ../deployment.zip .
+
+      - name: Deploy na AWS Lambda
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: sa-east-1  # Use sua região desejada
+          function_name: swapi-lambda  # Nome da função no Lambda
+          zip_file: deployment.zip

@@ -10,7 +10,7 @@ Um gateway foi implementado como camada intermediária entre os clientes e os se
 ## 🧭 Como Usar
 Para começar a utilizar a API, siga os passos abaixo:
 
-### 1. 🔥 Faça o Warm-Up do Cache
+### 1. 🔥 Faça o Warm-Up do Cache (opcional)
 Antes de realizar consultas, é recomendável popular o cache com todos os dados da SWAPI para garantir desempenho máximo e respostas legíveis com nomes em vez de URLs.
 
 ```
@@ -292,29 +292,6 @@ Este endpoint verifica:
 - Conectividade com Redis
 - Disponibilidade da SWAPI pública
 
-## 🌐 Infraestrutura GCP
-
-### Componentes da Arquitetura
-
-#### 🚪 API Gateway
-- **Função**: Ponto de entrada único para todas as requisições
-- **Benefícios**: Rate limiting, autenticação, logging, monitoramento
-- **Configuração**: Swagger/OpenAPI 2.0
-
-#### 🏃‍♂️ Cloud Run
-- **Função**: Hospedagem da aplicação FastAPI
-- **Benefícios**: Escalabilidade automática, serverless, pay-per-use
-- **Configuração**: Container Docker otimizado
-
-#### 🖥️ Compute Engine VM
-- **Função**: Hospedagem do Redis Cache
-- **Benefícios**: Performance dedicada, controle total, persistência
-- **Configuração**: VM otimizada para Redis
-
-#### 🐳 Docker
-- **Função**: Containerização da aplicação
-- **Benefícios**: Portabilidade, isolamento, deploy consistente
-- **Configuração**: Multi-stage build para otimização
 
 ### Fluxo de Dados
 
@@ -421,11 +398,6 @@ poetry run pytest tests/test_utils.py -v
 poetry run pytest tests/test_working.py -v
 ```
 
-### Cobertura de código:
-```bash
-poetry run pytest --cov=src/starwars_api --cov-report=html
-```
-
 ## 📚 Documentação Interativa
 
 ### Swagger UI (Recomendado)
@@ -518,73 +490,6 @@ docker compose restart redis
 # Testar conexão Redis
 redis-cli ping
 ```
-
-### Authentication Problems
-1. **Token Expirado**: Gere um novo token via `POST /auth`
-2. **Header Incorreto**: Verifique o formato `Authorization: Bearer <token>`
-3. **Token Inválido**: Verifique se o JWT_SECRET_KEY está correto
-
-### Cache Not Working
-1. **Redis Down**: Verifique se Redis está rodando
-2. **Wrong URL**: Confirme a variável `REDIS_URL` no ambiente
-3. **Empty Cache**: Use `POST /warm-cache` para popular o cache
-4. **Network Issues**: Verifique conectividade com a VM do Redis
-
-### SWAPI Connection Issues
-1. **Rate Limiting**: A SWAPI pública tem rate limits
-2. **Network Timeout**: Verifique conectividade com swapi.info
-3. **Cache Fallback**: Sistema utiliza cache quando SWAPI não responde
-
-### Cloud Run Issues
-1. **Cold Start**: Primeira requisição pode ser lenta
-2. **Memory Limits**: Verifique configuração de memória
-3. **Timeout**: Ajuste timeout do Cloud Run se necessário
-
-## 🔐 Segurança
-
-### JWT Token Security
-- Tokens expiram em 1 hora (configurável)
-- Secret key deve ser única por ambiente
-- Nunca exponha a secret key em logs
-
-### API Gateway Security
-- Rate limiting configurado
-- CORS apropriado para produção
-- Logs de auditoria habilitados
-
-### Redis Security
-- VM em rede privada
-- Firewall configurado
-- Sem acesso público direto
-
-## 📊 Monitoramento
-
-### Métricas Disponíveis
-- **Health Check**: Status da aplicação
-- **Redis Performance**: Latência e throughput
-- **SWAPI Calls**: Número de chamadas à API externa
-- **Cache Hit Rate**: Eficiência do cache
-
-### Logs Estruturados
-- Todas as requisições são logadas
-- Erros incluem stack traces
-- Métricas de performance por endpoint
-
-## 🚀 Performance
-
-### Benchmarks
-- **Com Cache**: ~10ms resposta média
-- **Sem Cache**: ~500ms resposta média
-- **Cache Hit Rate**: >95% em uso normal
-- **Throughput**: 1000+ req/s com cache
-
-### Otimizações
-- Conexões HTTP reutilizadas
-- Serialização JSON otimizada
-- Queries de banco eficientes
-- Compressão de responses
-
-## 📝 Notas Importantes
 
 ### Desenvolvimento
 - ✅ Arquivo `.env` incluído para facilitar desenvolvimento
