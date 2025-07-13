@@ -1,12 +1,11 @@
 FROM public.ecr.aws/lambda/python:3.10
 
-RUN pip install poetry
+WORKDIR /var/task
 
-COPY pyproject.toml poetry.lock ./
+COPY requirements.txt .
 
-RUN poetry config virtualenvs.create false && \
-    poetry install --only=main --no-interaction --no-ansi --no-root
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY src/ .
 
 CMD ["src.starwars_api.main.handler"]
