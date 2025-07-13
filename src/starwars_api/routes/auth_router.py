@@ -10,7 +10,6 @@ router = APIRouter(
 )
 
 auth_service = AuthService()
-cache_warmup_service = CacheWarmupService()
 redis= RedisCache()
 
 
@@ -23,9 +22,18 @@ async def authenticate():
 # Endpoint to warm up / seed the cache
 @router.post("/warm-cache", status_code=200, summary="Warm up cache")
 async def warm_cache():
+    try:
         warmupInstance = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
         result = await warmupInstance.warm_all()
         return {"message": "Cache warmed up successfully", "result": result}
+    except Exception as e:
+        return {"message": "Error warming up cache", "error": str(e)}
+    finally:
+        if redis.is_connected:
+            try:
+                await redis.disconnect()
+            except Exception as e:
+                print(f"Error disconnecting Redis: {e}")
 
 @router.get("/debug-env")
 async def debug_env():
