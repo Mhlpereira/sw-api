@@ -1,9 +1,8 @@
 import os
-
 from dotenv import load_dotenv
-
-from .cache import RedisCache
+from .redis_cache import RedisCache
 
 load_dotenv()
 
-redis_cache = RedisCache(os.getenv("REDIS_URL", "redis://localhost:6379"))
+def get_redis_cache(redis_url: str = None) -> RedisCache:
+    return RedisCache(redis_url or os.getenv("REDIS_URL"))

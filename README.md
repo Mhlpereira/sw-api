@@ -3,9 +3,9 @@
 
 Uma API construída com FastAPI, que consome dados da API pública do swapi.info. O sistema utiliza Redis para cache eficiente, reduzindo a latência e a carga sobre a API original. Implementa resolução inteligente de URLs, convertendo links brutos em nomes legíveis e informativos.
 
-O deploy foi realizado no Cloud Run (GCP), garantindo escalabilidade automática e baixo custo operacional. O Redis está hospedado em uma VM dedicada, separando a camada de cache para melhor desempenho e controle.
+O deploy foi realizado na AWS utilizando Lambda Functions com API Gateway. O Redis está hospedado em uma instância EC2 dedicada, separando a camada de cache para melhor desempenho e controle.
 
-Um gateway foi implementado como camada intermediária entre os clientes e os serviços internos, permitindo maior segurança, centralização de autenticação com JWT, controle de tráfego e fácil aplicação de políticas de rate limit e logging.
+A aplicação utiliza Mangum como adapter para executar FastAPI em ambiente serverless AWS Lambda. O sistema implementa controle de concorrência com semáforos e retry automático com Tenacity para garantir robustez na integração com APIs externas.
 
 ## 🧭 Como Usar
 Para começar a utilizar a API, siga os passos abaixo:
@@ -13,49 +13,41 @@ Para começar a utilizar a API, siga os passos abaixo:
 ### 1. 🔥 Faça o Warm-Up do Cache (opcional)
 Antes de realizar consultas, é recomendável popular o cache com todos os dados da SWAPI para garantir desempenho máximo e respostas legíveis com nomes em vez de URLs.
 
-```
-
-curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/warm-cache
+```bash
+curl -X POST https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/warm-cache
 ```
 
 Esse processo:
-
- - Pré-carrega os dados da API pública no Redis
-
- - Resolve automaticamente as URLs em nomes legíveis
-
- - Reduz significativamente a latência das próximas requisições
+- Pré-carrega os dados da API pública no Redis
+- Resolve automaticamente as URLs em nomes legíveis
+- Reduz significativamente a latência das próximas requisições
 
 ### 2. 🔐 Gere um Token de Autenticação (JWT)
 A maioria dos endpoints requer autenticação. Para isso, gere um token JWT:
 
-```
-
-curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/auth
+```bash
+curl -X POST https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/auth
 ```
 
 Resposta:
-
-```
-
+```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer"
 }
 ```
 
-Copie o valor do access_token.
-
 ### 3. 📡 Faça Requisições Autenticadas
 Agora que você tem um token JWT, use-o no header Authorization das suas requisições:
-```
-curl -H "Authorization: Bearer <seu_token>" https://swapi-gateway-9gaiurpg.uc.gateway.dev/swapi/people
-Você pode acessar qualquer endpoint da API (pessoas, filmes, planetas etc.) da mesma forma, sempre com o token no header.
+
+```bash
+curl -H "Authorization: Bearer <seu_token>" https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/swapi/people
 ```
 
 ### 4. 🔄 Resultado com Resolução de Nomes
-Graças ao warm-up e à lógica de cache inteligente, a resposta da API já virá com nomes resolvidos, como:
-```
+Graças ao warm-up e à lógica de cache inteligente, a resposta da API já virá com nomes resolvidos:
+
+```json
 {
   "name": "Luke Skywalker",
   "homeworld": "Tatooine",
@@ -65,18 +57,23 @@ Graças ao warm-up e à lógica de cache inteligente, a resposta da API já vir�
 
 ## 🌐 Acesso via API Gateway
 
-**Base URL**: `https://swapi-gateway-9gaiurpg.uc.gateway.dev`
+**Base URL**: `https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function`
 
-A API está disponível através do Google Cloud API Gateway e pode ser acessada diretamente pelos endpoints públicos configurados.
+A API está disponível através do AWS API Gateway que invoca uma Lambda Function.
 
 ## 🏗️ Arquitetura
 
-- **Frontend**: API Gateway (GCP)
-- **Backend**: FastAPI (Python 3.10+)
-- **Hospedagem**: Cloud Run (GCP)
-- **Cache**: Redis (VM no GCP)
-- **Containerização**: Docker
+- **Frontend**: AWS API Gateway
+- **Backend**: FastAPI + Mangum (Python 3.10+)
+- **Compute**: AWS Lambda Function
+- **Cache**: Redis (EC2 instance)
 - **Fonte de Dados**: SWAPI Pública (swapi.info)
+
+### Componentes Técnicos
+
+- **Mangum**: Adapter que permite executar aplicações FastAPI em AWS Lambda
+- **Semáforo**: Controla concorrência para evitar sobrecarga na API externa
+- **Tenacity**: Implementa retry automático com backoff exponencial para requests HTTP
 
 ## 🚀 Funcionalidades Principais
 
@@ -86,7 +83,7 @@ A API está disponível através do Google Cloud API Gateway e pode ser acessada
 - Sistema de fallback para garantir disponibilidade
 
 ### ✅ Sistema de Cache Inteligente
-- **Redis** hospedado em VM no GCP para performance máxima
+- **Redis** hospedado em EC2 na AWS para performance máxima
 - Cache automático de todas as consultas
 - Resolução de URLs para nomes (ex: `https://swapi.info/api/planets/1` → `"Tatooine"`)
 - TTL configurável para otimizar recursos
@@ -126,10 +123,10 @@ poetry run uvicorn src.starwars_api.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### 1. Gerar Bearer Token
 
-Faça uma requisição POST através do API Gateway para obter o token JWT:
+Faça uma requisição POST para obter o token JWT:
 
 ```bash
-curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/auth
+curl -X POST https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/auth
 ```
 
 **Resposta:**
@@ -145,10 +142,10 @@ curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/auth
 Inclua o token no header `Authorization` de todas as requisições para endpoints protegidos:
 
 ```bash
-curl -H "Authorization: Bearer <seu_token>" https://swapi-gateway-9gaiurpg.uc.gateway.dev/swapi/people
+curl -H "Authorization: Bearer <seu_token>" https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/swapi/people
 ```
 
-## 🔗 Endpoints do API Gateway
+## 🔗 Endpoints Disponíveis
 
 ### 🏥 Monitoramento
 - `GET /health` - Health check da aplicação
@@ -189,7 +186,7 @@ curl -H "Authorization: Bearer <seu_token>" https://swapi-gateway-9gaiurpg.uc.ga
 
 Todos os endpoints suportam filtros específicos para consultas precisas:
 
-**Exemplos de Filtros:**
+**Exemplos:**
 ```bash
 # Filtrar pessoas por nome
 GET /swapi/people?name=Luke
@@ -204,7 +201,7 @@ GET /swapi/starships?starship_class=Starfighter
 GET /swapi/people?name=Luke&eye_color=blue
 ```
 
-### Ordenação Inteligente
+### Ordenação
 
 Todos os endpoints suportam ordenação por qualquer campo:
 
@@ -219,30 +216,23 @@ GET /swapi/people?order=desc&order_by=height
 GET /swapi/planets?order=desc&order_by=population
 ```
 
-**Campos ordenáveis comuns:**
-- `name` (pessoas, espécies, planetas, naves, veículos)
-- `title` (filmes)
-- `height`, `mass` (pessoas)
-- `release_date`, `episode_id` (filmes)
-- `length`, `cost_in_credits` (naves, veículos)
-
 ## 💾 Sistema de Cache Redis
 
-### Estratégia de Cache Inteligente
+### Estratégia de Cache
 
-O sistema utiliza **Redis** hospedado em VM no GCP para otimizar performance:
+O sistema utiliza **Redis** hospedado em EC2 na AWS para otimizar performance:
 
 #### 🚀 Warm-up do Cache (Recomendado)
 ```bash
 # Popular cache com todos os dados da SWAPI
-curl -X POST https://swapi-gateway-9gaiurpg.uc.gateway.dev/warm-cache
+curl -X POST https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/warm-cache
 ```
 
-**Benefícios do warm-up:**
+**Benefícios:**
 - Cache pré-populado com todos os dados
 - Resolução prévia de URLs para nomes
 - Consultas subsequentes instantâneas
-- Redução de latência em 90%
+- Redução de latência significativa
 
 #### 🔄 Cache Automático
 Se não usar o warm-up, o cache é populado automaticamente:
@@ -254,17 +244,15 @@ Se não usar o warm-up, o cache é populado automaticamente:
 
 O sistema converte automaticamente URLs da SWAPI para nomes legíveis:
 
-**Exemplo prático:**
-```bash
-# Consulta inicial retorna URLs
-GET /swapi/people/1
+```json
+// Antes
 {
   "name": "Luke Skywalker",
   "homeworld": "https://swapi.info/api/planets/1",
   "films": ["https://swapi.info/api/films/1"]
 }
 
-# Após processamento (automático)
+// Depois
 {
   "name": "Luke Skywalker",
   "homeworld": "Tatooine",
@@ -287,32 +275,36 @@ GET /health
 }
 ```
 
-Este endpoint verifica:
-- Status da aplicação FastAPI
-- Conectividade com Redis
-- Disponibilidade da SWAPI pública
-
-
 ### Fluxo de Dados
 
 ```
-Cliente → API Gateway → Cloud Run → Redis VM
-                    ↓
-                 SWAPI.info
+Cliente → AWS API Gateway → Lambda Function → Redis (EC2)
+                                ↓
+                           SWAPI.info
 ```
 
-1. **Cliente** faz requisição via API Gateway
-2. **API Gateway** valida e roteia para Cloud Run
-3. **Cloud Run** verifica cache no Redis VM
-4. Se não cached: busca na **SWAPI pública**
-5. **Redis VM** armazena resultado para consultas futuras
+1. **Cliente** faz requisição via AWS API Gateway
+2. **API Gateway** roteia para Lambda Function
+3. **Lambda Function** (FastAPI + Mangum) verifica cache no Redis
+4. Se não cached: busca na **SWAPI pública** com retry automático
+5. **Redis** armazena resultado para consultas futuras
 6. **Resposta** retorna via API Gateway
+
+## ⚙️ Componentes Técnicos
+
+### Mangum
+Adapter que permite executar aplicações ASGI (FastAPI) em AWS Lambda Functions, convertendo eventos Lambda para requisições HTTP.
+
+### Semáforo (asyncio.Semaphore)
+Controla a concorrência limitando o número de requisições simultâneas para a API externa, evitando sobrecarga e rate limits.
+
+### Tenacity
+Implementa retry automático com backoff exponencial para requisições HTTP que falham, garantindo maior robustez na integração com APIs externas.
 
 ## ⚙️ Configuração de Ambiente
 
 ### Variáveis de Ambiente
 
-#### Para Desenvolvimento Local:
 ```bash
 # Redis Local
 REDIS_URL="redis://localhost:6379"
@@ -324,26 +316,9 @@ JWT_SECRET_KEY=your_secure_secret_key_here
 SWAPI_BASE_URL="https://swapi.info/api"
 ```
 
-#### Para Produção GCP:
-```bash
-# Redis VM (IP interno)
-REDIS_URL="redis://10.x.x.x:6379"
+## 🐳 Desenvolvimento Local
 
-# JWT Secret Key (segura)
-JWT_SECRET_KEY=your_production_secret_key
-
-# SWAPI Base URL
-SWAPI_BASE_URL="https://swapi.info/api"
-```
-
-### Gerar Nova JWT Secret Key:
-```bash
-openssl rand -hex 64
-```
-
-## 🐳 Docker & Containerização
-
-### Desenvolvimento Local:
+### Executar com Docker:
 ```bash
 # Iniciar Redis local
 docker compose up -d
@@ -351,29 +326,11 @@ docker compose up -d
 # Verificar status
 docker compose ps
 
-# Logs do Redis
-docker compose logs redis
-
-# Parar serviços
-docker compose down
+# Executar aplicação
+poetry run uvicorn src.starwars_api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Build para Produção:
-```bash
-# Build da imagem
-docker build -t starwars-api .
-
-# Run local
-docker run -p 8080:8080 starwars-api
-
-# Tag para GCP
-docker tag starwars-api gcr.io/YOUR_PROJECT/starwars-api
-
-# Push para Container Registry
-docker push gcr.io/YOUR_PROJECT/starwars-api
-```
-
-## 🧪 Testes & Qualidade
+## 🧪 Testes
 
 ### Executar todos os testes:
 ```bash
@@ -390,61 +347,21 @@ poetry run pytest tests/test_swapi_service.py -v
 
 # Testes de autenticação
 poetry run pytest tests/test_auth_service.py -v
-
-# Testes de utilitários
-poetry run pytest tests/test_utils.py -v
-
-# Testes funcionais completos
-poetry run pytest tests/test_working.py -v
 ```
 
-## 📚 Documentação Interativa
+## 📚 Documentação
 
-### Swagger UI (Recomendado)
+### Swagger UI
 ```
-https://swapi-gateway-9gaiurpg.uc.gateway.dev/docs
-```
-
-### ReDoc (Alternativa)
-```
-https://swapi-gateway-9gaiurpg.uc.gateway.dev/redoc
+https://qy5sfbks3c.execute-api.us-east-1.amazonaws.com/deploy/swapi-function/docs
 ```
 
-### Documentação Local (Desenvolvimento)
+### Desenvolvimento Local
 ```
 http://localhost:8000/docs
-http://localhost:8000/redoc
 ```
 
-## 🌟 Funcionalidades Avançadas
-
-### 1. Cache Inteligente Multi-Camada
-- **L1**: Cache local em memória para consultas frequentes
-- **L2**: Redis para persistência e compartilhamento
-- **L3**: Fallback para SWAPI pública
-
-### 2. Resolução Automática de URLs
-- URLs da SWAPI são transformadas em nomes legíveis
-- Sistema de cache específico para resolução de nomes
-- Fallback gracioso em caso de falha
-
-### 3. Autenticação JWT Robusta
-- Tokens com expiração configurável
-- Middleware de validação em todos os endpoints protegidos
-- Refresh automático de tokens
-
-### 4. Filtros Dinâmicos
-- Suporte a múltiplos filtros simultâneos
-- Filtros por campos aninhados
-- Filtros com operadores (igual, contém, maior que, etc.)
-
-### 5. Ordenação Inteligente
-- Detecção automática de tipos de dados
-- Ordenação numérica para campos numéricos
-- Ordenação lexicográfica para strings
-- Suporte a ordenação por múltiplos campos
-
-## 🛠️ Estrutura Técnica do Projeto
+## 🛠️ Estrutura do Projeto
 
 ```
 starwars_api/
@@ -463,44 +380,12 @@ starwars_api/
 │   │   └── swapi_service.py   # Serviço SWAPI
 │   ├── util/                   # Utilitários
 │   │   ├── naming.py          # Resolução de nomes
-│   │   ├── sorting.py         # Ordenação inteligente
+│   │   ├── sorting.py         # Ordenação
 │   │   └── resolve_name_fields.py # Resolução de campos
 │   └── enums/                  # Enumerações
 │       └── order_enum.py      # Enum de ordenação
 ├── tests/                      # Testes automatizados
 ├── docker-compose.yml          # Configuração Redis local
 ├── Dockerfile                  # Container da aplicação
-├── pyproject.toml             # Configuração Poetry
-└── swagger-api-gateway.yaml   # Configuração API Gateway
+└── pyproject.toml             # Configuração Poetry
 ```
-
-## 🚨 Troubleshooting
-
-### Redis Connection Issues
-```bash
-# Verificar se Redis está rodando
-docker compose ps
-
-# Verificar logs do Redis
-docker compose logs redis
-
-# Reiniciar Redis
-docker compose restart redis
-
-# Testar conexão Redis
-redis-cli ping
-```
-
-### Desenvolvimento
-- ✅ Arquivo `.env` incluído para facilitar desenvolvimento
-- ✅ JWT Secret Key fornecida apenas para testes
-- ✅ Redis configurado para desenvolvimento local
-
-### Produção
-- ⚠️ Gere nova JWT Secret Key para produção
-- ⚠️ Configure Redis em VM dedicada no GCP
-- ⚠️ Habilite HTTPS em todos os endpoints
-- ⚠️ Configure rate limiting apropriado
-
-### Licença
-Este projeto está sob licença MIT. Veja o arquivo LICENSE para detalhes.
