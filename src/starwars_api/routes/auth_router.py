@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import os
 from fastapi import APIRouter
 from starwars_api.cache.cache import RedisCache
@@ -10,7 +11,6 @@ router = APIRouter(
 )
 
 auth_service = AuthService()
-redis= RedisCache()
 
 
 # Endpoint to generate JWT token
@@ -22,7 +22,13 @@ async def authenticate():
 # Endpoint to warm up / seed the cache
 @router.post("/warm-cache", status_code=200, summary="Warm up cache")
 async def warm_cache():
+    redis = None
     try:
+        redis = RedisCache()
+
+        if not await redis.ping():
+            raise HTTPException(status_code=503, detail="Redis connection failed")
+        
         warmupInstance = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
         result = await warmupInstance.warm_all()
         return {"message": "Cache warmed up successfully", "result": result}
@@ -35,10 +41,26 @@ async def warm_cache():
             except Exception as e:
                 print(f"Error disconnecting Redis: {e}")
 
-@router.get("/debug-env")
-async def debug_env():
-    return {
-        "JWT_SECRET_KEY": os.getenv("JWT_SECRET_KEY", "NOT_FOUND")[:20] + "...",  # Só os primeiros 20 chars
-        "REDIS_URL": os.getenv("REDIS_URL", "NOT_FOUND")[:20] + "...",
-        "env_loaded": "JWT_SECRET_KEY" in os.environ
-    }
+@router.get("/redis-health")
+async def redis_health():
+    redis = None
+    try:
+        redis = RedisCache()
+        ping_result = await redis.ping()
+        return {
+            "status": "connected" if ping_result else "disconnected",
+            "redis_url": os.getenv("REDIS_URL", "NOT_FOUND")[:50] + "...",
+            "ping_result": ping_result
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "redis_url": os.getenv("REDIS_URL", "NOT_FOUND")[:50] + "..."
+        }
+    finally:
+        if redis:
+            try:
+                await redis.close()
+            except:
+                pass
