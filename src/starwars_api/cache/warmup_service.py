@@ -7,12 +7,14 @@ from tenacity import stop_after_attempt, wait_exponential
 class CacheWarmupService:
     def __init__(
         self,
+        redis_cache: RedisCache,  
         api_base_url: str = "https://swapi.info/api/",
         endpoints: List[str] = None,
         max_concurrent: int = 5,
         http_timeout: float = 30.0,
         delay_between_items: float = 0.5  # ⏱️ Delay entre cada item
     ):
+        self.redis = redis_cache  
         self.api_base_url = api_base_url
         self.endpoints = endpoints or ["people", "films", "starships", "vehicles", "species", "planets"]
         self.semaphore = asyncio.Semaphore(max_concurrent)

@@ -23,8 +23,9 @@ async def authenticate():
 # Endpoint to warm up / seed the cache
 @router.post("/warm-cache", status_code=200, summary="Warm up cache")
 async def warm_cache():
-        CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
-
+        warmupInstance = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
+        result = await warmupInstance.warm_all()
+        return {"message": "Cache warmed up successfully", "result": result}
 
 @router.get("/debug-env")
 async def debug_env():
