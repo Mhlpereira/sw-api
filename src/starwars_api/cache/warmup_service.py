@@ -2,22 +2,22 @@ import asyncio
 from typing import Dict, List
 import httpx
 from starwars_api.cache.cache import RedisCache
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import stop_after_attempt, wait_exponential
 
 class CacheWarmupService:
     def __init__(
         self,
-        redis_cache: RedisCache,
         api_base_url: str = "https://swapi.info/api/",
         endpoints: List[str] = None,
         max_concurrent: int = 5,
-        http_timeout: float = 30.0
+        http_timeout: float = 30.0,
+        delay_between_items: float = 0.5  # ⏱️ Delay entre cada item
     ):
-        self.redis = redis_cache
         self.api_base_url = api_base_url
         self.endpoints = endpoints or ["people", "films", "starships", "vehicles", "species", "planets"]
         self.semaphore = asyncio.Semaphore(max_concurrent)
         self.timeout = http_timeout
+        self.delay = delay_between_items
         self.retry_policy = {
             "stop": stop_after_attempt(3),
             "wait": wait_exponential(multiplier=1, min=1, max=5)
@@ -32,11 +32,8 @@ class CacheWarmupService:
             response = await client.get(f"{self.api_base_url}/{endpoint}", timeout=self.timeout)
             response.raise_for_status()
             return response.json()
-        except httpx.HTTPStatusError as e:
-            print(f"HTTP error for {endpoint}: {e.response.status_code}")
-            raise
         except Exception as e:
-            print(f"Error fetching {endpoint}: {str(e)}")
+            print(f"Erro ao buscar {endpoint}: {e}")
             raise
 
     async def warm_endpoint(self, endpoint: str) -> int:
@@ -45,34 +42,37 @@ class CacheWarmupService:
             if not data:
                 return 0
 
-            # Cache main endpoint data
+            # Cache principal
             await self._cache_data(endpoint, data)
             
-            # Cache individual items
+            # Cache itens individuais com delay entre cada um
             items = data.get("results", []) if isinstance(data, dict) else data
             if not isinstance(items, list):
                 items = [items]
 
-            tasks = [
-                self._cache_data(item["url"], item)
-                for item in items
-                if item and isinstance(item, dict) and item.get("url")
-            ]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            return sum(1 for r in results if r is True)
+            cached_count = 0
+            for item in items:
+                if item and isinstance(item, dict) and item.get("url"):
+                    try:
+                        result = await self._cache_data(item["url"], item)
+                        if result:
+                            cached_count += 1
+                    except Exception as e:
+                        print(f"Erro ao cachear {item.get('url')}: {e}")
+                    await asyncio.sleep(self.delay)  # 💤 Delay aqui
+            return cached_count
 
     async def warm_all(self) -> Dict[str, any]:
         if not await self.redis.ping():
             return {"status": "error", "message": "Redis connection failed"}
 
-        tasks = [self.warm_endpoint(endpoint) for endpoint in self.endpoints]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        results = await asyncio.gather(*[self.warm_endpoint(endpoint) for endpoint in self.endpoints], return_exceptions=True)
         
         successful = [r for r in results if not isinstance(r, Exception)]
-        failed = [i for i, r in enumerate(results) if isinstance(r, Exception)]
-        
+        failed = [self.endpoints[i] for i, r in enumerate(results) if isinstance(r, Exception)]
+
         return {
             "status": "partial" if failed else "success",
             "cached_items": sum(successful),
-            "failed_endpoints": [self.endpoints[i] for i in failed] if failed else None
+            "failed_endpoints": failed or None
         }

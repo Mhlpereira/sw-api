@@ -19,12 +19,14 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        await RedisCache.connect( )
+        redis_instance = RedisCache() 
+        connect = await redis_instance.connect( )
+        print(f"Connected to Redis successfully.", connect)
     except Exception as e:
         print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield
     try:
-        await RedisCache.disconnect()
+        await redis_instance.disconnect()
     except Exception as e:
         print(f"Warning: Redis disconnect error: {e}")
 

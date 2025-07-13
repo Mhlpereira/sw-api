@@ -9,7 +9,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 class RedisCache:
     _instance = None
-    _redis_url = None
+    _redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
     
     def __new__(cls, redis_url: str = None):
         if cls._instance is None:
