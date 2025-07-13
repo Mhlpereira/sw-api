@@ -56,9 +56,16 @@ class RedisCache:
         
     @asynccontextmanager
     async def get_connection(self):
-        await self._ensure_connection()
+        if not self._is_connected:
+            try:
+                self.connection = await redis.from_url(self.redis_url, ...)
+                await self.connection.ping()
+                self._is_connected = True
+            except Exception as e:
+                raise ConnectionError(f"Connection failed: {str(e)}")
+        
         try:
             yield self.connection
-        finally:
-            # Não fechamos a conexão aqui, mantemos pooling
-            pass
+        except redis.RedisError:
+            self._is_connected = False
+            raise
