@@ -19,27 +19,20 @@ async def authenticate():
     return await auth_service.generate_token()
 
 
-# Endpoint to warm up / seed the cache
 @router.post("/warm-cache", status_code=200, summary="Warm up cache")
 async def warm_cache():
-    redis = None
+    redis = RedisCache()
     try:
-        redis = RedisCache()
-
-        if not await redis.ping():
+        if not await redis.connect():
             raise HTTPException(status_code=503, detail="Redis connection failed")
         
-        warmupInstance = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
-        result = await warmupInstance.warm_all()
+        warmup = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
+        result = await warmup.warm_all()
         return {"message": "Cache warmed up successfully", "result": result}
     except Exception as e:
         return {"message": "Error warming up cache", "error": str(e)}
     finally:
-        if redis.is_connected:
-            try:
-                await redis.disconnect()
-            except Exception as e:
-                print(f"Error disconnecting Redis: {e}")
+        await redis.disconnect()
 
 @router.get("/redis-health")
 async def redis_health():
