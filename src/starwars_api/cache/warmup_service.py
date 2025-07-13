@@ -2,7 +2,6 @@ import asyncio
 import httpx
 from typing import Dict, List
 from starwars_api.cache.cache import RedisCache
-from starwars_api.util.naming import resolve_name_fields
 
 class CacheWarmupService:
     def __init__(
