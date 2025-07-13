@@ -13,7 +13,6 @@ router = APIRouter(
 auth_service = AuthService()
 
 
-# Endpoint to generate JWT token
 @router.post("/auth", status_code=201, summary="Generate JWT Token")
 async def authenticate():
     return await auth_service.generate_token()
@@ -24,15 +23,38 @@ async def warm_cache():
     redis = RedisCache()
     try:
         if not await redis.connect():
-            raise HTTPException(status_code=503, detail="Redis connection failed")
+            raise HTTPException(
+                status_code=503,
+                detail="Failed to connect to Redis"
+            )
+
+        warmup = CacheWarmupService(
+            redis_cache=redis,
+            request_delay=1.0,  
+            timeout=30.0
+        )
         
-        warmup = CacheWarmupService(redis_cache=redis, delay_between_items=1.0)
         result = await warmup.warm_all()
-        return {"message": "Cache warmed up successfully", "result": result}
+        
+        return {
+            "status": "success",
+            "details": result,
+            "message": f"Cache warmed up successfully. {result['total_cached']} items cached."
+        }
+        
+    except HTTPException:
+        raise  
     except Exception as e:
-        return {"message": "Error warming up cache", "error": str(e)}
+        return {
+            "status": "error",
+            "message": "Failed to warm up cache",
+            "error": str(e)
+        }
     finally:
-        await redis.disconnect()
+        try:
+            await redis.disconnect()
+        except Exception as e:
+            print(f"Error closing Redis connection: {e}")
 
 @router.get("/redis-health")
 async def redis_health():
