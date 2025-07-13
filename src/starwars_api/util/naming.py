@@ -2,8 +2,8 @@ import json
 from typing import List, Optional
 
 import httpx
+from starwars_api.cache.cache import RedisCache
 
-from starwars_api.cache import redis_cache
 
 
 async def url_to_name(urls: List[str]) -> List[Optional[str]]:
@@ -16,7 +16,7 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
             for url in urls:
                 try:
                     cache_key = f"name:{url}"
-                    cached_name = await redis_cache.get(cache_key)
+                    cached_name = await RedisCache.get(cache_key)
 
                     if cached_name:
                         if isinstance(cached_name, (bytes, bytearray)):
@@ -25,7 +25,7 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                         cache_hits += 1
                         continue
 
-                    cached_data = await redis_cache.get(url)
+                    cached_data = await RedisCache.get(url)
                     if cached_data:
                         try:
                             if isinstance(cached_data, (bytes, bytearray)):
@@ -37,7 +37,7 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                             name = data.get("name") or data.get("title")
 
                             if name:
-                                await redis_cache.set(cache_key, name, expire=3600)
+                                await RedisCache.set(cache_key, name, expire=3600)
                                 names.append(name)
                                 cache_hits += 1
                                 continue
@@ -56,9 +56,9 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                         name = data.get("name") or data.get("title")
                         names.append(name)
 
-                        await redis_cache.set(url, json.dumps(data), expire=3600)
+                        await RedisCache.set(url, json.dumps(data), expire=3600)
                         if name:
-                            await redis_cache.set(cache_key, name, expire=3600)
+                            await RedisCache.set(cache_key, name, expire=3600)
                     else:
                         names.append(None)
 

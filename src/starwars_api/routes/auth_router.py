@@ -1,7 +1,6 @@
 import os
 from fastapi import APIRouter
-
-from starwars_api.cache.warmup_service import cache_warmup_service
+from starwars_api.cache.warmup_service import CacheWarmupService
 from starwars_api.services.auth_service import AuthService
 
 router = APIRouter(
@@ -10,6 +9,7 @@ router = APIRouter(
 )
 
 auth_service = AuthService()
+cache_warmup_service = CacheWarmupService()
 
 
 # Endpoint to generate JWT token
