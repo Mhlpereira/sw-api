@@ -58,19 +58,21 @@ async def warm_cache():
 
 @router.get("/redis-health")
 async def redis_health():
-    redis = RedisCache()
+    redis = None
     try:
-        async with redis.get_connection() as conn:
-            ping_result = await conn.ping()
-            return {
-                "status": "connected" if ping_result else "disconnected",
-                "redis_url": os.getenv("REDIS_URL", "NOT_FOUND")[:50] + "...",
-                "ping_result": ping_result,
-                "connection_pool": str(conn.connection_pool)
-            }
+        redis = RedisCache()
+        ping_result = await redis.ping()
+        return {
+            "status": "connected" if ping_result else "disconnected",
+            "redis_url": os.getenv("REDIS_URL", "NOT_FOUND")[:50] + "...",
+            "ping_result": ping_result
+        }
     except Exception as e:
         return {
             "status": "error",
             "error": str(e),
             "redis_url": os.getenv("REDIS_URL", "NOT_FOUND")[:50] + "..."
         }
+    finally:
+        if redis:
+            await redis.disconnect()
