@@ -2,10 +2,10 @@ import asyncio
 from typing import Any, Dict, Optional
 
 import httpx
+from starwars_api.cache.cache import RedisCache
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from starwars_api.cache import redis_cache
-
+redis_cache = RedisCache()  
 
 class CacheWarmupService:
     _MAX_CONCURRENT_REQUESTS = 5
