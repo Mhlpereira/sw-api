@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
+from logging import root
 import os
 from xml.sax import handler
 
@@ -35,6 +36,7 @@ app = FastAPI(
     description="A FastAPI implementation of the Star Wars API (SWAPI) with caching and sorting capabilities.",
     version="1.0.0",
     lifespan=lifespan,
+    root_path="/deploy/swapi-function",
 )
 
 @app.get("/health")
@@ -44,7 +46,7 @@ def health_check():
 app.include_router(auth_router)
 app.include_router(swapi_router)
 
-handler = Mangum(app)
+handler = Mangum(app, api_gateway_base_path="/deploy/swapi-function")
 
 if __name__ == "__main__":
     import uvicorn
