@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import os
 import json
 import redis.asyncio as redis
@@ -52,3 +53,12 @@ class RedisCache:
             return await self.connection.ping()
         except Exception:
             return False
+        
+    @asynccontextmanager
+    async def get_connection(self):
+        await self._ensure_connection()
+        try:
+            yield self.connection
+        finally:
+            # Não fechamos a conexão aqui, mantemos pooling
+            pass
