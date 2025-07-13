@@ -50,23 +50,6 @@ class CacheWarmupService:
         
         return items
 
-    async def _process_and_cache_item(self, endpoint: str, item: Dict) -> bool:
-        if not item.get('url'):
-            return False
-
-        try:
-            if endpoint in self.resolvable_fields:
-                item = await resolve_name_fields(item, self.resolvable_fields[endpoint])
-            
-            await self.redis.set(item['url'], item)
-            
-            item_id = item['url'].rstrip('/').split('/')[-1]
-            await self.redis.set(f"{endpoint}:{item_id}", item)
-            
-            return True
-        except Exception as e:
-            print(f"Error processing {item.get('url')}: {str(e)}")
-            return False
 
     async def warm_endpoint(self, endpoint: str) -> Dict[str, any]:
         items = await self._fetch_all_pages(endpoint)
