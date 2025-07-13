@@ -1,8 +1,8 @@
 import asyncio
 from typing import Dict, List
 import httpx
+from starwars_api.cache.cache import RedisCache
 from tenacity import retry, stop_after_attempt, wait_exponential
-from .redis_cache import RedisCache
 
 class CacheWarmupService:
     def __init__(

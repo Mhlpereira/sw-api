@@ -1,12 +1,10 @@
-import asyncio
 from contextlib import asynccontextmanager
 from logging import root
 import os
-from xml.sax import handler
 
 from fastapi import FastAPI
 
-from starwars_api.cache import redis_cache
+from starwars_api.cache.cache import RedisCache
 from starwars_api.routes.auth_router import router as auth_router
 from starwars_api.routes.auth_router import warm_cache
 from starwars_api.routes.swapi_router import router as swapi_router
@@ -21,12 +19,12 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        await redis_cache.connect( )
+        await RedisCache.connect( )
     except Exception as e:
         print(f"Warning: Could not connect to Redis or warm cache: {e}")
     yield
     try:
-        await redis_cache.disconnect()
+        await RedisCache.disconnect()
     except Exception as e:
         print(f"Warning: Redis disconnect error: {e}")
 
