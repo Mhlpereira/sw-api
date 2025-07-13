@@ -11,7 +11,9 @@ from starwars_api.routes.auth_router import warm_cache
 from starwars_api.routes.swapi_router import router as swapi_router
 from fastapi.responses import JSONResponse
 from mangum import Mangum
-
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
 
 
