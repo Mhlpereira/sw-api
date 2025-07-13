@@ -8,6 +8,7 @@ class RedisCache:
     def __init__(self):
         self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
         self.connection = None
+        self._is_connected = False 
 
     async def connect(self):
         if not self.connection:
