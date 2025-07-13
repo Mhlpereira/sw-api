@@ -23,8 +23,7 @@ class CacheWarmupService:
             "wait": wait_exponential(multiplier=1, min=1, max=5)
         }
 
-    @retry(**self.retry_policy)
-    async def _cache_data(self, key: str, data: Any) -> bool:
+    async def _cache_data(self, key: str, data: any) -> bool:
         async with self.semaphore:
             return await self.redis.set(key, data, expire=3600)
 
@@ -62,7 +61,7 @@ class CacheWarmupService:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             return sum(1 for r in results if r is True)
 
-    async def warm_all(self) -> Dict[str, Any]:
+    async def warm_all(self) -> Dict[str, any]:
         if not await self.redis.ping():
             return {"status": "error", "message": "Redis connection failed"}
 
