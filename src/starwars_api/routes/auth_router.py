@@ -78,7 +78,7 @@ async def redis_health():
         if redis:
             await redis.disconnect()
             
-@router.get("/swapi", status_code=200, summary="SWAPI Health Check")
+@router.get("/swapi2", status_code=200, summary="SWAPI Health Check")
 async def swapi():
     async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get("https://swapi.info/api/")
