@@ -11,12 +11,12 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
         names = []
         cache_hits = 0
         cache_misses = 0
-
+        redis = RedisCache()
         async with httpx.AsyncClient() as client:
             for url in urls:
                 try:
                     cache_key = f"name:{url}"
-                    cached_name = await RedisCache.get(cache_key)
+                    cached_name = await redis.get(cache_key)
 
                     if cached_name:
                         if isinstance(cached_name, (bytes, bytearray)):
@@ -25,7 +25,7 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                         cache_hits += 1
                         continue
 
-                    cached_data = await RedisCache.get(url)
+                    cached_data = await redis.get(url)
                     if cached_data:
                         try:
                             if isinstance(cached_data, (bytes, bytearray)):
@@ -37,7 +37,7 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                             name = data.get("name") or data.get("title")
 
                             if name:
-                                await RedisCache.set(cache_key, name, expire=3600)
+                                await redis.set(cache_key, name, expire=3600)
                                 names.append(name)
                                 cache_hits += 1
                                 continue
@@ -56,9 +56,9 @@ async def url_to_name(urls: List[str]) -> List[Optional[str]]:
                         name = data.get("name") or data.get("title")
                         names.append(name)
 
-                        await RedisCache.set(url, json.dumps(data), expire=3600)
+                        await redis.set(url, json.dumps(data), expire=3600)
                         if name:
-                            await RedisCache.set(cache_key, name, expire=3600)
+                            await redis.set(cache_key, name, expire=3600)
                     else:
                         names.append(None)
 
