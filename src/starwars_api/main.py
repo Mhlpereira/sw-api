@@ -36,6 +36,14 @@ app = FastAPI(
     root_path="/deploy/swapi-function",
 )
 
+@app.get("/redis-test")
+async def redis_test():
+    redis = RedisCache()
+    return {
+        "status": "connected" if await redis.ping() else "disconnected",
+        "redis_url": os.getenv("REDIS_URL")
+    }
+    
 @app.get("/health")
 def health_check():
     return JSONResponse(content={"status": "ready"}, status_code=200)
