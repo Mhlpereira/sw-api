@@ -66,6 +66,7 @@ class CacheWarmupService:
         }
 
     async def warm_all(self) -> Dict[str, any]:
+        await self.redis.connect()
         results = []
         
         for endpoint in self.endpoints:
