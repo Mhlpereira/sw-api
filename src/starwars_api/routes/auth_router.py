@@ -81,13 +81,13 @@ async def redis_health():
 @router.get("/swapi2", status_code=200, summary="SWAPI Health Check")
 async def swapi():
     async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get("https://swapi.info/api/")
+            response = await client.get("https://swapi.info/api")
             response.raise_for_status()  # Levanta exceção se status não for 2xx
             data = response.json()
             
             return {
                 "status": "connected",
-                "swapi_url": "https://swapi.info/api/",
+                "swapi_url": "https://swapi.info/api",
                 "response_status": response.status_code,
                 "available_endpoints": list(data.keys()) if isinstance(data, dict) else "unknown"
             }
