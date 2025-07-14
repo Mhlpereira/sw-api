@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from starwars_api.cache.cache import RedisCache
 from starwars_api.cache.warmup_service import CacheWarmupService
 from starwars_api.services.auth_service import AuthService
+import httpx 
 
 router = APIRouter(
     prefix="",
@@ -76,3 +77,17 @@ async def redis_health():
     finally:
         if redis:
             await redis.disconnect()
+            
+@router.get("/swapi", status_code=200, summary="SWAPI Health Check")
+async def swapi():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get("https://swapi.info/api/")
+            response.raise_for_status()  # Levanta exceção se status não for 2xx
+            data = response.json()
+            
+            return {
+                "status": "connected",
+                "swapi_url": "https://swapi.info/api/",
+                "response_status": response.status_code,
+                "available_endpoints": list(data.keys()) if isinstance(data, dict) else "unknown"
+            }
