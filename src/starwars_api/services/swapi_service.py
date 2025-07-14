@@ -31,10 +31,10 @@ ENDPOINT_FIELDS_MAP = {
 class SwapiService:
     def __init__(self):
         self.api_url = "https://swapi.info/api/"
+        self.redis = RedisCache()
 
 
-
-    redis = RedisCache()
+    
     async def _get_cache_key(
         self,
         endpoint: str,
@@ -58,7 +58,7 @@ class SwapiService:
     ):
         cache_key = await self._get_cache_key(endpoint, resource_id, filters)
 
-        cached_data = await redis.get(cache_key)
+        cached_data = await self.redis.get(cache_key)
         if cached_data:
             return cached_data
 
@@ -72,7 +72,7 @@ class SwapiService:
             response.raise_for_status()
             data = response.json()
 
-            await redis.set(cache_key, data, expire=3600)
+            await self.redis.set(cache_key, data, expire=3600)
             return data
 
     async def _process_response(
@@ -111,14 +111,14 @@ class SwapiService:
             if sort_by:
                 processed_cache_key += f":sort:{sort_by}:{order.value}"
 
-            cached_processed = await redis.get(processed_cache_key)
+            cached_processed = await self.redis.get(processed_cache_key)
             if cached_processed:
                 return cached_processed
 
             data = await self._make_request(endpoint, None, filters)
             result = await self._process_response(data, endpoint, sort_by, order)
 
-            await redis.set(processed_cache_key, result, expire=1800)
+            await self.redis.set(processed_cache_key, result, expire=1800)
 
             return result
         except httpx.HTTPStatusError as e:
@@ -128,14 +128,14 @@ class SwapiService:
         try:
             processed_cache_key = f"{endpoint}_{resource_id}_processed"
 
-            cached_processed = await redis.get(processed_cache_key)
+            cached_processed = await self.redis.get(processed_cache_key)
             if cached_processed:
                 return cached_processed
 
             data = await self._make_request(endpoint, resource_id)
             result = await self._process_response(data, endpoint)
 
-            await redis.set(processed_cache_key, result, expire=1800)
+            await self.redis.set(processed_cache_key, result, expire=1800)
 
             return result
         except httpx.HTTPStatusError as e:
